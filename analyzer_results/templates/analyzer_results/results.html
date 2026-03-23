@@ -1,0 +1,16 @@
+{% extends 'analyzer_results/base.html' %}
+
+{% block title %}
+  Image stats
+{% endblock %}
+
+{% block body %}
+  <h2>Результат анализа</h2>
+  <img src="data:image/png;base64,{{ plot }}" alt="Analysis result" style="max-width: 100%;">
+  {% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
+
+  <div>
+    <a href="{% url 'analyzer_results:input_path' %}">Загрузить другую картинку</a>
+  </div>
+
+{% endblock %}

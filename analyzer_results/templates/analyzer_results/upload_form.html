@@ -1,0 +1,17 @@
+{% extends 'analyzer_results/base.html' %}
+
+{% block title %}
+  Image stats
+{% endblock %}
+
+{% block body %}
+  <div>
+    <form method="post">
+      {% csrf_token %}
+
+      <label for="image_path">Путь к изображению:</label>
+      <input type="text" name="image_path" id="image_path" required>
+      <button type="submit">Анализировать</button>
+    </form>
+  </div>
+{% endblock %}
