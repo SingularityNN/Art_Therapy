@@ -8,10 +8,16 @@
   <div>
     <form method="post">
       {% csrf_token %}
-
       <label for="image_path">Путь к изображению:</label>
       <input type="text" name="image_path" id="image_path" required>
       <button type="submit">Анализировать</button>
-    </form>
+      {% if messages %}
+          <ul>
+              {% for message in messages %}
+                  <li style="color: red;">{{ message }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
+  </form>
   </div>
 {% endblock %}

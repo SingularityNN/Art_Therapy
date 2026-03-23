@@ -8,6 +8,15 @@
     </title>
 </head>
 <body>
+
+    {% block urls %}
+        <ul>
+            <li><a href="{% url 'analyzer_results:start_page' %}">Стартовая страница</a></li>
+            <li><a href="{% url 'analyzer_results:show_res' %}">Показать результат анализа</a></li>
+            <li><a href="{% url 'analyzer_results:input_path' %}">Загрузить другую картинку</a></li>
+        </ul>
+    {% endblock %}
+
     {% block body %}
     {% endblock %}
 </body>
