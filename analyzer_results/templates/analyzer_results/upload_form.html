@@ -5,11 +5,19 @@
 {% endblock %}
 
 {% block body %}
+  <style>
+      form {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+      }
+  </style>
+
   <div>
     <form method="post">
       {% csrf_token %}
       <label for="image_path">Путь к изображению:</label>
-      <input type="text" name="image_path" id="image_path" required>
+      <input type="text" name="image_path" id="image_path" style="width: 300px;" required>
       <button type="submit">Анализировать</button>
       {% if messages %}
           <ul>

@@ -7,6 +7,7 @@
 {% block body %}
   <h2>Результат анализа</h2>
   <img src="data:image/png;base64,{{ plot }}" alt="Analysis result" style="max-width: 100%;">
+
   {% if messages %}
       <ul>
           {% for message in messages %}
@@ -14,9 +15,5 @@
           {% endfor %}
       </ul>
   {% endif %}
-
-  <div>
-    <a href="{% url 'analyzer_results:input_path' %}">Загрузить другую картинку</a>
-  </div>
 
 {% endblock %}
