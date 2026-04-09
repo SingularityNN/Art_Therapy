@@ -165,12 +165,12 @@ def analyze_image(image_path):
 
     # 1. Исходное изображение (верхний левый)
     axes[0, 0].imshow(display_img_rgb)
-    axes[0, 0].set_title('Source Image (scaled)')
+    axes[0, 0].set_title('Исходное изображение')
     axes[0, 0].axis('off')
 
     # 2. Квадрат среднего цвета (верхний правый)
     axes[0, 1].imshow(color_square_rgb)
-    axes[0, 1].set_title(f'Avg Color (H={avg_h}, S={avg_s}, V={avg_v})')
+    axes[0, 1].set_title(f'Средний цвет по изображению (H={avg_h}, S={avg_s}, V={avg_v})')
     axes[0, 1].axis('off')
 
     # 3. Гистограмма (нижний левый)

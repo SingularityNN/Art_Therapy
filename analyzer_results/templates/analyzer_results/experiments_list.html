@@ -1,0 +1,40 @@
+{% extends 'analyzer_results/base.html' %}
+
+{% block title %}
+  Experiments list
+{% endblock %}
+
+{% block body %}
+  <h2>Список экспериментов:</h2>
+
+  {% if experiments %}
+
+  <ul>
+    {% for exp in experiments %}
+
+    <li>
+      {{ exp.id }}<br>
+      <img src="data:image/png;base64,{{ exp.analyzer_res_json.plot_base64 }}"
+           alt="Analysis result"
+           style="max-width: 100%; border: 3px dotted black; margin: 10px 0;"><br>
+
+    </li>
+
+    {% endfor %}
+  </ul>
+
+
+  {% else %}
+  <h3>Сохраненных экспериментов нет</h3>
+  {% endif %}
+
+
+  {% if messages %}
+      <ul>
+          {% for message in messages %}
+              <li style="color: red;">{{ message }}</li>
+          {% endfor %}
+      </ul>
+  {% endif %}
+
+{% endblock %}

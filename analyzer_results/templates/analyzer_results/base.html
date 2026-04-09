@@ -38,8 +38,8 @@
     {% block urls %}
         <div class="links">
             <a href="{% url 'analyzer_results:start_page' %}">Стартовая страница</a>
-            <a href="{% url 'analyzer_results:show_res' %}">Показать результат анализа</a>
-            <a href="{% url 'analyzer_results:input_path' %}">Загрузить другую картинку</a>
+            <a href="{% url 'analyzer_results:experiments_list' %}">Показать все записи</a>
+            <a href="{% url 'analyzer_results:add_experiment' %}">Добавить эксперимент</a>
         </div>
     {% endblock %}
 
