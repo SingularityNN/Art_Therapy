@@ -2,37 +2,37 @@
 setlocal enabledelayedexpansion
 
 echo ====================================
-echo  Установка зависимостей и настройка
+echo  Installing dependancies
 echo ====================================
 
-:: Переходим в папку скрипта
+:: Change to script directory
 cd /d "%~dp0"
 
-:: Проверяем наличие виртуального окружения
-if not exist "venv\" (
-    echo Виртуальное окружение не найдено. Создаём...
-    python -m venv venv
+:: Check for virtual environment
+if not exist ".venv\" (
+    echo Virtual environment not found. Creating...
+    python -m venv .venv
     if errorlevel 1 (
-        echo Ошибка: не удалось создать виртуальное окружение. Убедитесь, что Python установлен.
+        echo Error: failed to create virtual environment. Make sure Python is installed.
         pause
         exit /b 1
     )
-    echo Виртуальное окружение создано.
+    echo Virtual environment created.
 )
 
-:: Активируем виртуальное окружение
-call venv\Scripts\activate
+:: Activate virtual environment
+call .venv\Scripts\activate
 
-:: Устанавливаем зависимости, если есть requirements.txt
+:: Install dependencies if requirements.txt exists
 if exist "requirements.txt" (
-    echo Устанавливаем зависимости из requirements.txt...
+    echo Installing dependencies from requirements.txt...
     pip install -r requirements.txt
     if errorlevel 1 (
-        echo Ошибка при установке зависимостей.
+        echo Error installing dependencies.
         pause
         exit /b 1
     )
-    echo Зависимости установлены.
+    echo Dependencies installed.
 ) else (
-    echo Файл requirements.txt не найден. Пропускаем установку зависимостей.
+    echo requirements.txt not found. Skipping dependency installation.
 )

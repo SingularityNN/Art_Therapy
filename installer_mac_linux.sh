@@ -1,37 +1,37 @@
 #!/bin/bash
-# Устанавливаем режим выхода при ошибках (опционально)
+# Set exit on error mode (optional)
 set -e
 
 echo "====================================="
-echo " Установка зависимостей и настройка"
+echo " Installing dependencies and setup"
 echo "====================================="
 
-# Переходим в директорию скрипта
+# Change to script directory
 cd "$(dirname "$0")"
 
-# Проверяем наличие виртуального окружения
-if [ ! -d "venv" ]; then
-    echo "Виртуальное окружение не найдено. Создаём..."
-    python3 -m venv venv
+# Check for virtual environment
+if [ ! -d ".venv" ]; then
+    echo "Virtual environment not found. Creating..."
+    python3 -m venv .venv
     if [ $? -ne 0 ]; then
-        echo "Ошибка: не удалось создать виртуальное окружение. Убедитесь, что Python 3 установлен."
+        echo "Error: failed to create virtual environment. Make sure Python 3 is installed."
         exit 1
     fi
-    echo "Виртуальное окружение создано."
+    echo "Virtual environment created."
 fi
 
-# Активируем виртуальное окружение
-source venv/bin/activate
+# Activate virtual environment
+source .venv/bin/activate
 
-# Устанавливаем зависимости, если есть requirements.txt
+# Install dependencies if requirements.txt exists
 if [ -f "requirements.txt" ]; then
-    echo "Устанавливаем зависимости из requirements.txt..."
+    echo "Installing dependencies from requirements.txt..."
     pip install -r requirements.txt
     if [ $? -ne 0 ]; then
-        echo "Ошибка при установке зависимостей."
+        echo "Error installing dependencies."
         exit 1
     fi
-    echo "Зависимости установлены."
+    echo "Dependencies installed."
 else
-    echo "Файл requirements.txt не найден. Пропускаем установку зависимостей."
+    echo "requirements.txt not found. Skipping dependency installation."
 fi
