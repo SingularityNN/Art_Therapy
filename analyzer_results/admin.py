@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from analyzer_results.models import Experiments
+
+
+@admin.register(Experiments)
+class ExperimentsAdmin(admin.ModelAdmin):
+    pass
+

@@ -1,0 +1,31 @@
+{% extends 'analyzer_results/base.html' %}
+
+{% block title %}
+  Add experiment
+{% endblock %}
+
+
+{% block body %}
+  <h2>Добавить новый эксперимент</h2>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div>
+            <label for="{{ form.drawing.id_for_label }}">{{ form.drawing.label }}:</label><br>
+            {{ form.drawing }}<br>
+        </div>
+
+        <br>
+        <button type="submit">Сохранить</button>
+        <a href="/">Отмена</a>
+    </form>
+{% endblock %}
