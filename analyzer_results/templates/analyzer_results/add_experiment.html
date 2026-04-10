@@ -1,25 +1,17 @@
 {% extends 'analyzer_results/base.html' %}
 
+{% load static %}
+<link rel="stylesheet" href="{% static 'analyzer_results/styles.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/bootstrap.css' %}">
+
 {% block title %}
   Add experiment
 {% endblock %}
 
 
 {% block body %}
-    <style>
-        .exp_form {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
 
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-
-        }
-    </style>
+    <div class="header-placeholder"></div>
 
     {% if messages %}
         <ul>
@@ -29,23 +21,33 @@
         </ul>
     {% endif %}
 
-    <div class="container">
-        <div class="exp_form">
-            <p>Для создания новой записи прикрепите рисунок:</p>
 
-            <form method="post" enctype="multipart/form-data" style="display: flex; justify-content: center; flex-direction: column;">
+    <div class="center-wrapper">
+        <div class="form-container">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <div>
-                    {{ form.drawing }}<br>
-                </div>
+                <div class="mb-3">
+                    <label for="{{ form.drawing.id_for_label }}" class="form-label">
+                        Для создания записи прикрепите рисунок:
+                    </label>
+                    {{ form.drawing }}
 
-                <br>
-                <button type="submit">Сохранить</button>
-                <a href="/">Отмена</a>
+                    {% if form.drawing.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.drawing.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Сохранить</button>
             </form>
         </div>
     </div>
+
+
+
+
+
 
 
 

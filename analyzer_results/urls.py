@@ -10,4 +10,5 @@ urlpatterns = [
     path('', start_page, name='start_page'),
     path('experiments_list/', experiments_list_all, name='experiments_list'),
 
+
 ]

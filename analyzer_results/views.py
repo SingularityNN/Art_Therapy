@@ -35,7 +35,7 @@ def add_experiment(request: HttpRequest) -> HttpResponse:
             experiment.save()
 
             messages.success(request, f'Эксперимент "{experiment.id}" успешно добавлен.')
-            return redirect(reverse('analyzer_results:start_page'))
+            return redirect(reverse('analyzer_results:experiments_list'))
 
         else:
             messages.error(request, 'Исправьте ошибки в форме.')

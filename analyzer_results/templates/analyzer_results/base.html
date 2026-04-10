@@ -8,6 +8,7 @@
         {% endblock %}
     </title>
 
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'analyzer_results/styles.css' %}">
 
 
@@ -16,11 +17,17 @@
 <body>
 
     {% block urls %}
-        <div class="links">
-            <a href="{% url 'analyzer_results:start_page' %}">Стартовая страница</a>
-            <a href="{% url 'analyzer_results:experiments_list' %}">Показать все записи</a>
-            <a href="{% url 'analyzer_results:add_experiment' %}">Добавить эксперимент</a>
-        </div>
+        <header>
+            <div class="links-container gap-3">
+                <a class="btn btn btn-outline-primary" href="{% url 'analyzer_results:start_page' %}" role="button">Стартовая страница</a>
+                <a class="btn btn-outline-primary" href="{% url 'analyzer_results:experiments_list' %}" role="button">Показать все записи</a>
+                <a class="btn btn-outline-primary" href="{% url 'analyzer_results:add_experiment' %}" role="button">Добавить эксперимент</a>
+            </div>
+
+            <div class="admin-tab-container gap-3">
+                <a class="btn btn-outline-danger" href="{% url 'admin:index' %}" role="button">Панель админа</a>
+            </div>
+        </header>
     {% endblock %}
 
     {% block body %}
