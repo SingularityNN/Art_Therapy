@@ -1,9 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
-import os
 from image_analyzer.analyzer import analyze_image
-from django.conf import settings
 from .forms import ExperimentForm
 from .models import Experiments
 
