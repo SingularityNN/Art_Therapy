@@ -9,13 +9,13 @@ echo ====================================
 cd /d "%~dp0"
 
 :: Проверяем наличие py.exe (Python Launcher)
-where py >nul 2>nul
-if errorlevel 1 (
-    echo Python Launcher (py.exe) не найден. Убедитесь, что Python установлен.
-    echo Скачайте Python с python.org и при установке отметьте "Add Python to PATH".
-    pause
-    exit /b 1
-)
+@REM where python >nul 2>nul
+@REM if errorlevel 1 (
+@REM     echo Python Launcher (py.exe) не найден. Убедитесь, что Python установлен.
+@REM     echo Скачайте Python с python.org и при установке отметьте "Add Python to PATH".
+@REM     pause
+@REM     exit /b 1
+@REM )
 
 :: Check for virtual environment
 if not exist ".venv\" (
