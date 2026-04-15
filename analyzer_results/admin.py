@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from analyzer_results.models import Experiments
+from .models import Experiments
 
 
 @admin.register(Experiments)
 class ExperimentsAdmin(admin.ModelAdmin):
-    pass
+    list_display = "id", "drawing", "psych_test_image"
 

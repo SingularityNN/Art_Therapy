@@ -6,6 +6,11 @@ class Experiments(models.Model):
     analyzer_res_json = models.JSONField(default=dict, blank=True)
     psych_test_image = models.ImageField()
     psych_test_json = models.JSONField(default=dict, blank=True)
+    note = models.TextField(default="", blank=True)
+
+    def __str__(self) -> str:
+        return self.id[4:-5]
 
     class Meta:
         ordering = ["id", ]
+        verbose_name_plural = "Experiments"

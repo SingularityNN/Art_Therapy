@@ -2,6 +2,7 @@
 
 {% load static %}
 <link rel="stylesheet" href="{% static 'analyzer_results/styles.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/bootstrap.css' %}">
 
 {% block title %}
   Experiments list
@@ -21,7 +22,8 @@
     {% for exp in experiments %}
 
     <div class="centered-div" style="margin-top: 20px;">
-        <h4>{{ exp.id }}<br></h4>
+        <h4><a class="link-secondary link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+               href="{% url 'analyzer_results:experiment_detail' exp.id %}">{{ exp.id }}</a><br></h4>
     </div>
 
 

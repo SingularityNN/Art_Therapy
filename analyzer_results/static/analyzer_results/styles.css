@@ -49,8 +49,17 @@ header {
     min-height: 80vh;
 }
 
+.center-wrapper-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+
+}
+
 .form-container {
     width: 100%;
+    height: 100%;
     max-width: 400px;
     background-color: #e9ecef;
     border: 2px solid black;
@@ -91,4 +100,36 @@ body::before {
   filter: blur(8px);
 
   z-index: -1; /* Уводим на задний план под текст */
+}
+
+.form-fullscreen-wrapper {
+  display: flex;
+  justify-content: center;      /* горизонтальное центрирование содержимого */
+  align-items: center;          /* вертикальное центрирование содержимого */
+  width: 100%;                  /* на всю ширину родителя */
+  min-height: calc(100vh - 70px - 100px); /* динамическая высота с учётом хедера и изображения */
+  /* 70px — высота header-placeholder, 100px — запас под заголовок и изображение */
+  /* Можно использовать просто min-height: 60vh, если точные отступы не критичны */
+}
+
+.form-container-full {
+  width: 90%;                  /* во весь экран по ширине */
+  max-width: 800px;            /* опционально: ограничение на очень больших мониторах */
+  margin: 0 20px;               /* небольшие отступы по бокам */
+  background-color: #e9ecef;
+  border: 2px solid black;
+  border-radius: 30px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.form-container-full textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Кнопка остаётся в потоке, но можно добавить центрирование, если нужно */
+.form-container-full button {
+  display: block;
+  margin-top: 15px;
 }

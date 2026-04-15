@@ -1,0 +1,64 @@
+{% extends 'analyzer_results/base.html' %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'analyzer_results/styles.css' %}">
+
+
+{% block title %}
+  Experiment detail
+{% endblock %}
+
+{% block body %}
+  <div class="header-placeholder"></div>
+
+  <div class="bg-blur"></div>
+
+  <div style="display: flex; justify-content: center;">
+      <h2>Эксперимент: "{{ exp.id }}"</h2>
+  </div>
+
+
+      <div class="form-fullscreen-wrapper">
+        <div class="form-container-full">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="{{ form.note.id_for_label }}" class="form-label">
+                Заметки:
+              </label>
+              {{ form.note }}
+
+              {% if form.note.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.note.errors }}
+                </div>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+          </form>
+        </div>
+      </div>
+
+
+    <div class="centered-div" style="margin-bottom: 60px;">
+        <img src="data:image/png;base64,{{ exp.analyzer_res_json.plot_base64 }}"
+             alt="Analysis result"
+             class="analyzer_img"><br>
+    </div>
+
+
+
+
+
+
+  {% if messages %}
+      <ul>
+          {% for message in messages %}
+              <li style="color: red;">{{ message }}</li>
+          {% endfor %}
+      </ul>
+  {% endif %}
+
+{% endblock %}
