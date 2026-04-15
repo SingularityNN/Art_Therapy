@@ -60,6 +60,11 @@ def experiment_detail(request: HttpRequest, id) -> HttpResponse:
         form = NoteForm(instance=exp)
     return render(request, 'analyzer_results/experiment_detail.html', {'form': form, 'exp': exp,})
 
+def delete_experiment (request: HttpRequest, id) -> HttpResponse:
+    obj = Experiments.objects.get(id=id)
+    obj.delete()
+    return redirect(reverse('analyzer_results:experiments_list'))
+
 def start_page(request: HttpRequest) -> HttpResponse:
     return render(request, 'analyzer_results/start_page.html')
 
