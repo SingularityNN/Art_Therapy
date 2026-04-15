@@ -2,27 +2,18 @@
 setlocal enabledelayedexpansion
 
 echo ====================================
-echo  Installing dependancies
+echo  Installing dependencies
 echo ====================================
 
 :: Change to script directory
 cd /d "%~dp0"
 
-:: Проверяем наличие py.exe (Python Launcher)
-where py >nul 2>nul
-if errorlevel 1 (
-    echo Python Launcher (py.exe) не найден. Убедитесь, что Python установлен.
-    echo Скачайте Python с python.org и при установке отметьте "Add Python to PATH".
-    pause
-    exit /b 1
-)
-
 :: Check for virtual environment
 if not exist ".venv\" (
     echo Virtual environment not found. Creating...
-    py -m venv .venv
+    python -m venv .venv
     if errorlevel 1 (
-        echo Error: failed to create virtual environment. Make sure Python is installed.
+        echo Error: failed to create virtual environment. Make sure Python is installed and added to PATH.
         pause
         exit /b 1
     )
