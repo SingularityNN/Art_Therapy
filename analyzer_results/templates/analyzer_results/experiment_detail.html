@@ -42,10 +42,16 @@
       </div>
 
 
-    <div class="centered-div" style="margin-bottom: 60px;">
-        <img src="data:image/png;base64,{{ exp.analyzer_res_json.plot_base64 }}"
-             alt="Analysis result"
-             class="analyzer_img"><br>
+    <div class="center-wrapper">
+        <div class="centered-div" style="margin-bottom: 60px; flex-direction: column;">
+            <img src="data:image/png;base64,{{ exp.analyzer_res_first_json.plot_base64 }}"
+                 alt="Analysis result"
+                 class="analyzer_img"><br>
+
+            <img src="data:image/png;base64,{{ exp.analyzer_res_second_json.plot_base64 }}"
+                 alt="Analysis result"
+                 class="analyzer_img"><br>
+        </div>
     </div>
 
 

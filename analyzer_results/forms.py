@@ -4,9 +4,10 @@ from .models import Experiments
 class ExperimentForm(forms.ModelForm):
     class Meta:
         model = Experiments
-        fields = ['drawing',]
+        fields = ['drawing_first', 'drawing_second']
         widgets = {
-            'drawing': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'drawing_first': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'drawing_second': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 class NoteForm(forms.ModelForm):

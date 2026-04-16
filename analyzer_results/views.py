@@ -10,25 +10,35 @@ def add_experiment(request: HttpRequest) -> HttpResponse:
         form = ExperimentForm(request.POST, request.FILES)
         if form.is_valid():
 
-            # get experiment.drawing
-            drawing_file = form.cleaned_data['drawing']
+            # get experiment.drawing_first
+            drawing_first_file = form.cleaned_data['drawing_first']
+
+            # get experiment.drawing_second
+            drawing_second_file = form.cleaned_data['drawing_second']
 
             # get experiment.id
-            file_name = drawing_file.name
-            file_name_shortened = file_name[4:-5]
+            file_name_first = drawing_first_file.name
+            file_name_second = drawing_second_file.name
+            file_name_shortened = file_name_first[4:-7]
 
             if Experiments.objects.filter(id=file_name_shortened).exists():
                 messages.error(request, f'Эксперимент с id "{file_name_shortened}" уже существует')
                 return render(request, 'analyzer_results/add_experiment.html', {'form': form})
 
-            # get experiment.analyzer_res_json
-            image_path = "art/" + file_name
-            analyzer_res = analyze_image(image_path)
+            # get experiment.analyzer_res_first_json
+            image_path_first = "art/" + file_name_first
+            analyzer_res_first = analyze_image(image_path_first)
+
+            # get experiment.analyzer_res_second_json
+            image_path_second = "art/" + file_name_second
+            analyzer_res_second = analyze_image(image_path_second)
 
             experiment = Experiments(
                 id = file_name_shortened,
-                drawing = drawing_file,
-                analyzer_res_json = analyzer_res,
+                drawing_first = drawing_first_file,
+                analyzer_res_first_json = analyzer_res_first,
+                drawing_second = drawing_second_file,
+                analyzer_res_second_json = analyzer_res_second,
             )
 
             experiment.save()

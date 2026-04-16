@@ -28,14 +28,24 @@
                 {% csrf_token %}
 
                 <div class="mb-3">
-                    <label for="{{ form.drawing.id_for_label }}" class="form-label">
-                        Для создания записи прикрепите рисунок:
+                    <label for="{{ form.drawing_first.id_for_label }}" class="form-label">
+                        Для создания записи прикрепите два рисунка:
                     </label>
-                    {{ form.drawing }}
+                    {{ form.drawing_first }}
 
-                    {% if form.drawing.errors %}
+                    {% if form.drawing_first.errors %}
                         <div class="invalid-feedback d-block">
-                            {{ form.drawing.errors }}
+                            {{ form.drawing_first.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.drawing_second.id_for_label }}" class="form-label">
+
+                    </label>
+                    {{ form.drawing_second }}
+
+                    {% if form.drawing_second.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.drawing_second.errors }}
                         </div>
                     {% endif %}
                 </div>
@@ -43,13 +53,6 @@
             </form>
         </div>
     </div>
-
-
-
-
-
-
-
 
 
 {% endblock %}
