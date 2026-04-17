@@ -22,7 +22,7 @@
     {% endif %}
 
 
-    <div class="center-wrapper">
+    <div class="center-wrapper" style="flex-direction: column;">
         <div class="form-container">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -52,7 +52,17 @@
                 <button type="submit" class="btn btn-outline-primary">Сохранить</button>
             </form>
         </div>
+
+        <div class="form-container" style="display: flex; align-items: center; justify-content: center;">
+            <form method="post" action="{% url 'analyzer_results:import_drawings' %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-primary" type="submit">Импортировать все картинки из art/</button>
+            </form>
+        </div>
+
     </div>
+
+
 
 
 {% endblock %}

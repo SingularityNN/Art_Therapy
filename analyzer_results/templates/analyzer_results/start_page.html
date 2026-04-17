@@ -11,11 +11,12 @@
 
 {% block body %}
   <div class="bg-blur"></div>
-  <div class="centered-div" style="height: 500px; flex-direction: column;">
+  <div class="centered-div" style="height: 500px; flex-direction: column; margin: 10 px 0;">
     <h1>Арт-терапия: анализ рисунков</h1>
     <a class="btn btn-outline-secondary"
        href="{% url 'analyzer_results:export_to_xlsx' %}"
        role="button">Экспортировать в .xlsx</a>
+
   </div>
 
 {% endblock %}

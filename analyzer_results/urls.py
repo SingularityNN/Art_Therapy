@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import start_page, add_experiment, experiments_list_all, experiment_detail, delete_experiment, export_to_xlsx
+from .views import start_page, add_experiment, experiments_list_all, experiment_detail, delete_experiment, export_to_xlsx, import_drawings
 
 app_name = 'analyzer_results'
 
@@ -10,5 +10,6 @@ urlpatterns = [
     path('experiment_detail/<str:id>/', experiment_detail, name='experiment_detail'),
     path('delete_experiment/<str:id>/', delete_experiment, name='delete_experiment'),
     path('export_to_xlsx', export_to_xlsx, name='export_to_xlsx'),
+    path('import_drawings', import_drawings, name='import_drawings'),
 
 ]

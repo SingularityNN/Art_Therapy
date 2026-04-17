@@ -6,6 +6,103 @@ from openpyxl.styles import PatternFill
 from image_analyzer.analyzer import analyze_image
 from .forms import ExperimentForm, NoteForm
 from .models import Experiments
+import os
+import re
+from django.conf import settings
+from django.core.files import File
+
+def import_drawings(request: HttpRequest) -> HttpResponse:
+    """Импортирует все пары картинок из папки art, выполняет анализ и сохраняет в БД"""
+    if request.method != 'POST':
+        return redirect('analyzer_results:experiments_list')
+
+    # Путь к папке art (рядом с manage.py)
+    art_folder = os.path.join(settings.BASE_DIR, 'art')
+    if not os.path.isdir(art_folder):
+        messages.error(request, f'Папка art не найдена: {art_folder}')
+        return redirect('analyzer_results:experiments_list')
+
+    # Регулярное выражение для парсинга имён файлов
+    # Ожидаем формат: art_<идентификатор>_1.jpeg (или _2, любое расширение)
+    pattern = re.compile(r'art_(.+)_([12])\.[a-zA-Z0-9]+$')
+
+    # Словарь: идентификатор -> {1: (имя_файла, полный_путь), 2: ...}
+    pairs = {}
+
+    for filename in os.listdir(art_folder):
+        full_path = os.path.join(art_folder, filename)
+        if not os.path.isfile(full_path):
+            continue
+
+        match = pattern.match(filename)
+        if not match:
+            continue  # пропускаем файлы, не соответствующие шаблону
+
+        base_id = match.group(1)  # например, "aksenova" или "chugrova_32f"
+        number = int(match.group(2))
+
+        if base_id not in pairs:
+            pairs[base_id] = {}
+        pairs[base_id][number] = (filename, full_path)
+
+    # Статистика
+    created = 0
+    updated = 0
+    skipped = 0
+
+    for exp_id, files in pairs.items():
+        # Проверяем наличие обоих номеров
+        if 1 not in files or 2 not in files:
+            skipped += 1
+            continue
+
+        filename1, path1 = files[1]
+        filename2, path2 = files[2]
+
+        # Относительные пути для функции analyze_image (как в ручной функции)
+        rel_path1 = os.path.join('art', filename1)
+        rel_path2 = os.path.join('art', filename2)
+
+        try:
+            # Выполняем анализ
+            analyzer_res_first = analyze_image(rel_path1)
+            analyzer_res_second = analyze_image(rel_path2)
+        except Exception as e:
+            messages.error(request, f'Ошибка анализа для "{exp_id}": {e}')
+            skipped += 1
+            continue
+
+        # Получаем существующую запись или создаём новую
+        obj, created_flag = Experiments.objects.get_or_create(id=exp_id)
+
+        # Если запись уже существовала, удаляем старые файлы
+        if not created_flag:
+            if obj.drawing_first and os.path.exists(obj.drawing_first.path):
+                os.remove(obj.drawing_first.path)
+            if obj.drawing_second and os.path.exists(obj.drawing_second.path):
+                os.remove(obj.drawing_second.path)
+
+        # Сохраняем новые изображения в ImageField
+        with open(path1, 'rb') as f1, open(path2, 'rb') as f2:
+            obj.drawing_first.save(filename1, File(f1), save=False)
+            obj.drawing_second.save(filename2, File(f2), save=False)
+
+        # Заполняем JSON-поля результатами анализа
+        obj.analyzer_res_first_json = analyzer_res_first
+        obj.analyzer_res_second_json = analyzer_res_second
+        obj.save()
+
+        if created_flag:
+            created += 1
+        else:
+            updated += 1
+
+    messages.success(
+        request,
+        f'Импорт завершён. Создано: {created}, обновлено: {updated}, пропущено (неполные пары): {skipped}'
+    )
+    return redirect('analyzer_results:experiments_list')
+
 
 def export_to_xlsx(request: HttpRequest) -> HttpResponse:
     queryset = Experiments.objects.all()
