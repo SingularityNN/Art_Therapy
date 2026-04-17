@@ -24,6 +24,13 @@ def analyze_image(image_path):
             - 'color_square_base64': квадрат среднего цвета в формате base64.
             - 'plot_base64': гистограмма распределения в формате base64.
             - 'error': сообщение об ошибке (если есть).
+            - 'ignored_white_pixels': процент игнорированных белых пикселей
+            - 'avg_hue': средний оттенок на рисунке
+            - 'avg_saturation': средняя насыщенность пикселей
+            - 'avg_brightness': средняя яркость пикселей
+            - 'red_percent': процент пикселей красного диапазона
+            - 'green_percent': процент пикселей зеленого диапазона
+            - 'blue_percent': процент пикселей синего диапазона
     """
     # Загружаем изображение
     img = cv2.imread(image_path)
@@ -227,5 +234,12 @@ def analyze_image(image_path):
         'source_image_base64': source_img_base64,
         'color_square_base64': color_square_base64,
         'plot_base64': plot_base64,
-        'error': None
+        'error': None,
+        'ignored_white_pixels': ignored_pixels / total_pixels_all * 100,
+        'avg_hue': avg_h,
+        'avg_saturation': avg_s,
+        'avg_brightness': avg_v,
+        'red_percent': count_red / total_pixels_used * 100,
+        'green_percent': count_green / total_pixels_used * 100,
+        'blue_percent': count_blue / total_pixels_used * 100,
     }

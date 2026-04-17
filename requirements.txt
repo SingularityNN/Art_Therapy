@@ -6,3 +6,4 @@ opencv-python
 numpy
 matplotlib
 Django
+openpyxl==3.1.5
