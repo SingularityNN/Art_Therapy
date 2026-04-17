@@ -5,8 +5,23 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import hsv_to_rgb
 import io
 import base64
-
 from . import config
+
+def make_json_serializable(obj):
+    """Рекурсивно преобразует numpy-типы в стандартные Python типы (int, float, list)."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: make_json_serializable(value) for key, value in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [make_json_serializable(item) for item in obj]
+    else:
+        return obj
+
 
 def analyze_image(image_path):
     """
@@ -43,86 +58,71 @@ def analyze_image(image_path):
 
     # Конвертируем BGR в HSV для анализа
     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-    height, width, channels = hsv_img.shape
+    height, width, _ = hsv_img.shape
     total_pixels_all = height * width
-    ignored_pixels = 0
 
-    # Переменные для сумм H, S, V (только для не-белых)
-    all_h = 0
-    all_s = 0
-    all_v = 0
+    # ========== НАЧАЛО ВЕКТОРИЗОВАННОГО УЧАСТКА (вместо циклов) ==========
+    # Извлекаем каналы H, S, V как целочисленные массивы (int16 для H 0-179)
+    H = hsv_img[:, :, 0].astype(np.int16)
+    S = hsv_img[:, :, 1].astype(np.int16)
+    V = hsv_img[:, :, 2].astype(np.int16)
 
-    # Счётчики пикселей в каждой цветовой зоне (не-белые)
-    count_red = 0
-    count_green = 0
-    count_blue = 0
+    # Маска "цветных" пикселей (не белых, насыщенность выше порога)
+    color_mask = (S >= config.SATURATION_THRESHOLD)
+    total_colored = np.sum(color_mask)
+    ignored_pixels = total_pixels_all - total_colored
 
-    # Для красной зоны используем векторное усреднение
-    sum_cos_red = 0.0
-    sum_sin_red = 0.0
-
-    # Для зелёной и синей зон — обычная сумма
-    sum_h_green = 0
-    sum_h_blue = 0
-
-    for i in range(height):
-        for j in range(width):
-            h = int(hsv_img[i, j, 0])
-            s = int(hsv_img[i, j, 1])
-            v = int(hsv_img[i, j, 2])
-
-            # Проверяем, является ли пиксель "цветным" (достаточно насыщенным)
-            if s < config.SATURATION_THRESHOLD:
-                ignored_pixels += 1
-                continue
-
-            # Общие суммы для средних по всем не-белым пикселям
-            all_h += h
-            all_s += s
-            all_v += v
-
-            # Распределение по диапазонам оттенка
-            if (0 <= h < 30) or (150 <= h < 180):      # красная зона
-                count_red += 1
-                angle = h * 2   # h (0-179) -> угол (0-358)
-                rad = math.radians(angle)
-                sum_cos_red += math.cos(rad)
-                sum_sin_red += math.sin(rad)
-            elif 30 <= h < 90:                          # зелёная зона
-                count_green += 1
-                sum_h_green += h
-            elif 90 <= h < 150:                          # синяя зона
-                count_blue += 1
-                sum_h_blue += h
-            # Пиксели с h в других диапазонах не попадают (h всегда 0-179)
-
-    total_pixels_used = count_red + count_green + count_blue
-
-    if total_pixels_used == 0:
+    if total_colored == 0:
         return {'error': 'Нет цветных пикселей (все отброшены как белые)'}
 
-    # Средние по всем учтённым пикселям
-    avg_h = all_h // total_pixels_used
-    avg_s = all_s // total_pixels_used
-    avg_v = all_v // total_pixels_used
+    # Общие суммы и средние по всем цветным пикселям
+    all_h = np.sum(H[color_mask])
+    all_s = np.sum(S[color_mask])
+    all_v = np.sum(V[color_mask])
 
-    # Средний оттенок для красной зоны (циклическое усреднение)
+    avg_h = all_h // total_colored
+    avg_s = all_s // total_colored
+    avg_v = all_v // total_colored
+
+    # Маски для цветовых зон (только среди цветных пикселей)
+    red_mask   = color_mask & ((H < 30) | (H >= 150))
+    green_mask = color_mask & ((H >= 30) & (H < 90))
+    blue_mask  = color_mask & ((H >= 90) & (H < 150))
+
+    count_red   = np.sum(red_mask)
+    count_green = np.sum(green_mask)
+    count_blue  = np.sum(blue_mask)
+
+    # --- Средний оттенок для красной зоны (циклическое усреднение) ---
     if count_red > 0:
-        mean_cos = sum_cos_red / count_red
-        mean_sin = sum_sin_red / count_red
+        h_red = H[red_mask].astype(np.float64)
+        angles = h_red * 2                     # перевод в градусы 0..358
+        rad = np.radians(angles)
+        mean_cos = np.mean(np.cos(rad))
+        mean_sin = np.mean(np.sin(rad))
         avg_angle_rad = math.atan2(mean_sin, mean_cos)
         avg_angle_deg = math.degrees(avg_angle_rad) % 360
-        avg_h_red = int(round(avg_angle_deg / 2))       # обратно в шкалу 0–179
+        avg_h_red = int(round(avg_angle_deg / 2))
     else:
         avg_h_red = 0
 
-    # Средний оттенок для зелёной зоны
-    avg_h_green = (sum_h_green // count_green) if count_green > 0 else 0
-    # Средний оттенок для синей зоны
-    avg_h_blue = (sum_h_blue // count_blue) if count_blue > 0 else 0
+    # --- Средний оттенок для зелёной зоны (целочисленное среднее) ---
+    if count_green > 0:
+        avg_h_green = int(np.sum(H[green_mask]) // count_green)
+    else:
+        avg_h_green = 0
 
-    # Формируем текстовую статистику
+    # --- Средний оттенок для синей зоны ---
+    if count_blue > 0:
+        avg_h_blue = int(np.sum(H[blue_mask]) // count_blue)
+    else:
+        avg_h_blue = 0
+
+    total_pixels_used = total_colored  # для совместимости с оригиналом
+
+    # ========== КОНЕЦ ВЕКТОРИЗОВАННОГО УЧАСТКА ==========
+
+    # Формируем текстовую статистику (без изменений)
     stats_text = (
         f"Всего пикселей: {total_pixels_all}\n"
         f"Игнорировано 'белых' пикселей (S < {config.SATURATION_THRESHOLD}): {ignored_pixels} "
@@ -151,7 +151,7 @@ def analyze_image(image_path):
     else:
         stats_text += f"  Синий   : 0 пикс. (0.00%)\n"
 
-    # Функция для создания квадрата цвета
+    # Функция для создания квадрата цвета (без изменений)
     def create_hsv_square(h, s, v):
         square = np.zeros((config.SQUARE_SIZE, config.SQUARE_SIZE, 3), dtype=np.uint8)
         square[:] = (h, s, v)
@@ -165,26 +165,22 @@ def analyze_image(image_path):
     # Подготовка исходного изображения для отображения (BGR -> RGB)
     display_img_rgb = cv2.cvtColor(display_img, cv2.COLOR_BGR2RGB)
 
-    # --- Построение гистограммы ---
-    plt.switch_backend('Agg')  # Отключаем GUI
+    # --- Построение гистограммы (без изменений) ---
+    plt.switch_backend('Agg')
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     fig.canvas.manager.set_window_title('Анализ рисунка')
 
-    # 1. Исходное изображение (верхний левый)
     axes[0, 0].imshow(display_img_rgb)
     axes[0, 0].set_title('Исходное изображение')
     axes[0, 0].axis('off')
 
-    # 2. Квадрат среднего цвета (верхний правый)
     axes[0, 1].imshow(color_square_rgb)
     axes[0, 1].set_title(f'Средний цвет по изображению (H={avg_h}, S={avg_s}, V={avg_v})')
     axes[0, 1].axis('off')
 
-    # 3. Гистограмма (нижний левый)
     if distribution:
         zone_names = [d['zone'] for d in distribution]
         percentages = [d['percentage'] for d in distribution]
-        # Цвета столбцов: используем оттенок из среднего H каждой зоны
         bar_colors = []
         for d in distribution:
             h_norm = d['avg_h'] / 179.0
@@ -203,7 +199,6 @@ def analyze_image(image_path):
         axes[1, 0].set_title('Распределение по зонам оттенка')
         axes[1, 0].axis('off')
 
-    # 4. Текстовая статистика (нижний правый)
     axes[1, 1].axis('off')
     axes[1, 1].text(0.05, 0.95, stats_text, transform=axes[1, 1].transAxes,
                     fontsize=10, verticalalignment='top', family='monospace',
@@ -211,14 +206,12 @@ def analyze_image(image_path):
 
     plt.tight_layout()
 
-    # Сохраняем график в буфер
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=100)
     buf.seek(0)
     plot_base64 = base64.b64encode(buf.read()).decode('utf-8')
     plt.close(fig)
 
-    # Сохраняем исходное изображение и квадрат цвета в base64
     def img_to_base64(img_rgb):
         _, buffer = cv2.imencode('.png', cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR))
         return base64.b64encode(buffer).decode('utf-8')
@@ -227,7 +220,7 @@ def analyze_image(image_path):
     color_square_base64 = img_to_base64(color_square_rgb)
 
     # Возвращаем результат
-    return {
+    result = {
         'avg_hsv': (avg_h, avg_s, avg_v),
         'stats_text': stats_text,
         'distribution': distribution,
@@ -243,3 +236,7 @@ def analyze_image(image_path):
         'green_percent': count_green / total_pixels_used * 100,
         'blue_percent': count_blue / total_pixels_used * 100,
     }
+
+    # Преобразуем все numpy-типы в стандартные Python-типы
+    result = make_json_serializable(result)
+    return result
