@@ -23,8 +23,8 @@ def export_to_xlsx(request: HttpRequest) -> HttpResponse:
     headers = ['ID',
             'ignored_white_pixels (%)',
             'avg_hue (0-179)',
-            'avg_saturation (0-100)',
-            'avg_brightness (0-100)',
+            'avg_saturation (0-255)',
+            'avg_brightness (0-255)',
             'red_percent (%)',
             'green_percent (%)',
             'blue_percent (%)']
