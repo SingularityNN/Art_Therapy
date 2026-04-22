@@ -36,3 +36,19 @@ if exist "requirements.txt" (
 ) else (
     echo requirements.txt not found. Skipping dependency installation.
 )
+
+:: Django migrations
+echo Applying Django migrations...
+python manage.py makemigrations
+if errorlevel 1 (
+    echo Error while creating migrations.
+    pause
+    exit /b 1
+)
+python manage.py migrate
+if errorlevel 1 (
+    echo Error while applying migrations.
+    pause
+    exit /b 1
+)
+echo Migrations applied successfully.

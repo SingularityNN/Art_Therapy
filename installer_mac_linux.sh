@@ -35,3 +35,8 @@ if [ -f "requirements.txt" ]; then
 else
     echo "requirements.txt not found. Skipping dependency installation."
 fi
+
+echo "Applying Django migrations..."
+python manage.py makemigrations
+python manage.py migrate
+echo "Migrations applied successfully."
